@@ -150,8 +150,8 @@ SIMPLE_JWT = {
 EMAIL_BACKEND = "django.core.mail.backends.smtp.EmailBackend"
 EMAIL_HOTS = 'smtp.gmail.com'
 EMAIL_PORT = 587
-EMAIL_HOST_USER = os.environ.get('EMAIL_USER')
-EMAIL_HOST_PASSWORD = os.environ.get('EMAIL_PASS')
+EMAIL_HOST_USER ='email'
+EMAIL_HOST_PASSWORD = 'pass'
 EMAIL_USER_TLS = True
 
 #Djoser settings
@@ -170,7 +170,11 @@ DJOSER = {
         'user_create': 'account.serializers.UserCreateSerializer',
         'user': 'account.serializers.UserCreateSerializer',
         'user_delete': 'djoser.serializers.UserDeleteSerializer',
-    }
+    },
+    "EMAIL": {
+        "activation": "account.email.ActivationEmail",
+        "confirmation": "account.email.ConfirmationEmail",
+    },
 }
 
 CORS_ALLOWED_ORIGINS = [
