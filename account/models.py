@@ -1,39 +1,29 @@
 from django.db import models
 from django.contrib.auth.models import BaseUserManager, AbstractBaseUser
 
+
 # Custom User Manager
 class UserManager(BaseUserManager):
-    def create_user(self, email, name, is_admin=False, password=None):
+    def create_user(self, email, name, password=None, **extra_fields):
+        extra_fields.setdefault("is_admin", False)
         if not email:
-            raise ValueError('User must have an email address')
+            raise ValueError("User must have an email address")
 
-        user = self.model(
-            email=self.normalize_email(email),
-            name=name,
-            is_admin=is_admin
-        )
+        user = self.model(email=self.normalize_email(email), name=name, **extra_fields)
         user.set_password(password)
         user.save(using=self._db)
         return user
 
-
-    def create_superuser(self, email, name, is_admin=False, password=None):
-        print(name, '-------------')
-        user = self.model(
-            email=email,
-            password=password,
-            name=name,
-            is_admin=is_admin
-        )
-        user.is_admin = True
-        user.save(using=self._db)
-        return user
+    def create_superuser(self, email, password=None, **extra_fields):
+        name = extra_fields.pop("name")
+        extra_fields.setdefault("is_admin", True)
+        return self.create_user(email, name, password, **extra_fields)
 
 
 # Custom User Model
 class User(AbstractBaseUser):
     email = models.EmailField(
-        verbose_name='Email',
+        verbose_name="Email",
         max_length=255,
         unique=True,
     )
@@ -43,9 +33,9 @@ class User(AbstractBaseUser):
     created_at = models.DateTimeField(auto_now_add=True)
     updated_at = models.DateTimeField(auto_now_add=True)
 
-    USERNAME_FIELD = 'email'
-    REQUIRED_FIELD = ['name', 'is_admin']
-    
+    USERNAME_FIELD = "email"
+    REQUIRED_FIELDS = ["name", "is_admin"]
+
     objects = UserManager()
 
     def __str__(self):
@@ -63,5 +53,4 @@ class User(AbstractBaseUser):
     @property
     def is_staff(self):
         return self.is_admin
-
-
+    
